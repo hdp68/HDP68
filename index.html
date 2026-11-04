@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Image Converter</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PyScript CSS & JS -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <py-config>
+        packages = ["pillow"]
+    </py-config>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 sm:p-8 space-y-6 border border-gray-100">
+        <div class="text-center space-y-2">
+            <h1 class="text-2xl font-bold text-gray-800">??? Python Image Converter</h1>
+            <p class="text-sm text-gray-500">Chuy?n d?i m?i d?nh d?ng ?nh tr?c ti?p trên trình duy?t b?ng Python.</p>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Ch?n file ?nh:</label>
+                <input type="file" id="image-file" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border border-gray-200 rounded-xl p-1"/>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Chuy?n sang d?nh d?ng:</label>
+                <select id="target-format" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <option value="PNG">PNG</option>
+                    <option value="JPEG">JPEG / JPG</option>
+                    <option value="WEBP">WEBP</option>
+                    <option value="BMP">BMP</option>
+                    <option value="ICO">ICO</option>
+                </select>
+            </div>
+
+            <button id="convert-btn" py-click="convert_image" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-xl transition duration-200 shadow-md">
+                Chuy?n Ð?i Ngay
+            </button>
+        </div>
+
+        <div id="output-area" class="text-center space-y-3 hidden border-t pt-4">
+            <p id="status-text" class="text-sm text-indigo-600 font-medium">Ðang x? lý...</p>
+            <div id="download-container"></div>
+        </div>
+    </div>
+
+    <script type="py">
+        import io
+        import base64
+        from PIL import Image
+        import js
+
+        async def convert_image(event):
+            file_input = js.document.getElementById("image-file")
+            output_area = js.document.getElementById("output-area")
+            status_text = js.document.getElementById("status-text")
+            download_container = js.document.getElementById("download-container")
+            
+            output_area.classList.remove("hidden")
+            
+            if len(file_input.files) == 0:
+                status_text.innerText = "?? Vui lòng ch?n m?t file ?nh tru?c!"
+                return
+
+            status_text.innerText = "? Ðang kh?i d?ng Python và x? lý..."
+            
+            file = file_input.files.item(0)
+            array_buffer = await file.arrayBuffer()
+            bytes_data = bytes(array_buffer.to_py())
+            
+            target_format = js.document.getElementById("target-format").value
+            
+            try:
+                img = Image.open(io.BytesIO(bytes_data))
+                if target_format == "JPEG" and img.mode in ("RGBA", "P"):
+                    img = img.convert("RGB")
+                elif target_format == "ICO":
+                    img = img.resize((256, 256))
+                
+                buffer = io.BytesIO()
+                save_fmt = "JPEG" if target_format == "JPEG" else target_format
+                img.save(buffer, format=save_fmt)
+                buffer.seek(0)
+                
+                encoded_img = base64.b64encode(buffer.getvalue()).decode("utf-8")
+                mime_type = "image/jpeg" if target_format == "JPEG" else f"image/{target_format.lower()}"
+                data_url = f"data:{mime_type};base64,{encoded_img}"
+                
+                file_name_base = file.name.rsplit('.', 1)[0]
+                new_file_name = f"{file_name_base}.{target_format.lower()}"
+                
+                download_container.innerHTML = f'''
+                    <a href="{data_url}" download="{new_file_name}" 
+                       class="inline-block bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-xl transition duration-200 shadow-md">
+                        ?? T?i xu?ng ({new_file_name})
+                    </a>
+                '''
+                status_text.innerText = "? Chuy?n d?i thành công!"
+            except Exception as e:
+                status_text.innerText = f"? L?i: {str(e)}"
+    </script>
+</body>
+</html>
