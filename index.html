@@ -17,18 +17,18 @@
 
     <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 sm:p-8 space-y-6 border border-gray-100">
         <div class="text-center space-y-2">
-            <h1 class="text-2xl font-bold text-gray-800">??? Python Image Converter</h1>
-            <p class="text-sm text-gray-500">Chuy?n d?i m?i d?nh d?ng ?nh tr?c ti?p tr�n tr�nh duy?t b?ng Python.</p>
+            <h1 class="text-2xl font-bold text-gray-800">🖼️ Python Image Converter</h1>
+            <p class="text-sm text-gray-500">Chuyển đổi mọi định dạng ảnh trực tiếp trên trình duyệt bằng Python.</p>
         </div>
 
         <div class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Ch?n file ?nh:</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Chọn file ảnh:</label>
                 <input type="file" id="image-file" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border border-gray-200 rounded-xl p-1"/>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Chuy?n sang d?nh d?ng:</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Chuyển sang định dạng:</label>
                 <select id="target-format" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     <option value="PNG">PNG</option>
                     <option value="JPEG">JPEG / JPG</option>
@@ -39,12 +39,12 @@
             </div>
 
             <button id="convert-btn" py-click="convert_image" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-xl transition duration-200 shadow-md">
-                Chuy?n �?i Ngay
+                Chuyển Đổi Ngay
             </button>
         </div>
 
         <div id="output-area" class="text-center space-y-3 hidden border-t pt-4">
-            <p id="status-text" class="text-sm text-indigo-600 font-medium">�ang x? l�...</p>
+            <p id="status-text" class="text-sm text-indigo-600 font-medium">Đang xử lý...</p>
             <div id="download-container"></div>
         </div>
     </div>
@@ -64,10 +64,10 @@
             output_area.classList.remove("hidden")
             
             if len(file_input.files) == 0:
-                status_text.innerText = "?? Vui l�ng ch?n m?t file ?nh tru?c!"
+                status_text.innerText = "⚠️ Vui lòng chọn một file ảnh trước!"
                 return
 
-            status_text.innerText = "? �ang kh?i d?ng Python v� x? l�..."
+            status_text.innerText = "⏳ Đang khởi động Python và xử lý..."
             
             file = file_input.files.item(0)
             array_buffer = await file.arrayBuffer()
@@ -97,12 +97,12 @@
                 download_container.innerHTML = f'''
                     <a href="{data_url}" download="{new_file_name}" 
                        class="inline-block bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-xl transition duration-200 shadow-md">
-                        ?? T?i xu?ng ({new_file_name})
+                        📥 Tải xuống ({new_file_name})
                     </a>
                 '''
-                status_text.innerText = "? Chuy?n d?i th�nh c�ng!"
+                status_text.innerText = "✅ Chuyển đổi thành công!"
             except Exception as e:
-                status_text.innerText = f"? L?i: {str(e)}"
+                status_text.innerText = f"❌ Lỗi: {str(e)}"
     </script>
 </body>
 </html>
